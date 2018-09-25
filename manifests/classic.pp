@@ -46,6 +46,7 @@ class samba::classic(
   $security                       = 'ads',
   $sambaloglevel                  = 1,
   $join_domain                    = true,
+  $join_dns_update                = true,
   $manage_winbind                 = true,
   $krbconf                        = true,
   $nsswitch                       = true,
@@ -337,10 +338,14 @@ class samba::classic(
         default => "createcomputer=\"${joinou}\"",
         undef   => '',
       }
+      $no_dns_updates = $join_dns_update ? {
+        false   => '--no-dns-updates',
+        default => '',
+      }
       exec{ 'Join Domain':
         path    => '/bin:/sbin:/usr/sbin:/usr/bin/',
         unless  => 'net ads testjoin',
-        command => "echo '${adminpassword}'| net ads join -U '${adminuser}' ${ou}",
+        command => "echo '${adminpassword}'| net ads join -U '${adminuser}' ${no_dns_updates} ${ou}",
         notify  => Service['SambaWinBind'],
         require => Package['SambaClassic'],
       }
