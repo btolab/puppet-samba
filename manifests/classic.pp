@@ -334,11 +334,12 @@ class samba::classic(
         default => '',
       }
       exec{ 'Join Domain':
-        path    => '/bin:/sbin:/usr/sbin:/usr/bin/',
-        unless  => 'net ads testjoin',
-        command => "echo '${adminpassword}'| net ads join -U '${adminuser}' ${no_dns_updates} ${ou}",
-        notify  => Service['SambaWinBind'],
-        require => Package['SambaClassic'],
+        path        => '/bin:/sbin:/usr/sbin:/usr/bin/',
+        unless      => 'net ads testjoin',
+        environment => ["NET_PASSWORD=${adminpassword}"],
+        command     => "echo \$NET_PASSWORD | net ads join -U '${adminuser}' ${no_dns_updates} ${ou}",
+        notify      => Service['SambaWinBind'],
+        require     => Package['SambaClassic'],
       }
     }
   }
