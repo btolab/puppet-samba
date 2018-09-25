@@ -123,10 +123,8 @@ class samba::classic(
     }
 
     if $nsswitch {
-      package{ 'SambaNssWinbind':
-        ensure => 'installed',
-        name   => $packagesambansswinbind
-      }
+      $nss_packages = [] + $packagesambansswinbind
+      ensure_packages($nss_packages)
 
       augeas{'samba nsswitch group':
         context => "/files/${samba::params::nsswitchconffile}/",
@@ -151,15 +149,8 @@ class samba::classic(
     }
 
     if $pam {
-      # Only add package here if different to the nss-winbind package,
-      # or nss and pam aren't both enabled, to avoid duplicate definition.
-      if ($packagesambapamwinbind != $packagesambansswinbind)
-      or !$nsswitch {
-        package{ 'SambaPamWinbind':
-          ensure => 'installed',
-          name   => $packagesambapamwinbind
-        }
-      }
+      $pamwinbind_packages = [] + $packagesambapamwinbind
+      ensure_packages($pamwinbind_packages)
 
       if $krbconf {
         $winbindauthargs = ['krb5_auth', 'krb5_ccache_type=FILE', 'cached_login', 'try_first_pass']
