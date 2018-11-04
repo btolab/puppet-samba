@@ -343,7 +343,9 @@ class samba::classic(
         environment => ["NET_PASSWORD=${adminpassword}"],
         command     => "echo \$NET_PASSWORD | net ads join -U '${adminuser}' ${no_dns_updates_arg} ${ou}",
         notify      => Service['SambaWinBind'],
-        require     => Package['SambaClassic'],
+        require     => [
+          Samba::Option[$mandatoryglobaloptionsindex,$globaloptionsindex],
+        ],
       }
     }
   }
