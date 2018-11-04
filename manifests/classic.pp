@@ -329,15 +329,19 @@ class samba::classic(
         default => "createcomputer=\"${joinou}\"",
         undef   => '',
       }
-      $no_dns_updates = $join_dns_update ? {
-        false   => '--no-dns-updates',
-        default => '',
+      if versioncmp($facts['samba_version'], '4.3.0') <= 0 {
+        $no_dns_updates_arg = ''
+      } else {
+        $no_dns_updates_arg = $join_dns_update ? {
+          false   => '--no-dns-updates',
+          default => '',
+        }
       }
       exec{ 'Join Domain':
         path        => '/bin:/sbin:/usr/sbin:/usr/bin/',
         unless      => 'net ads testjoin',
         environment => ["NET_PASSWORD=${adminpassword}"],
-        command     => "echo \$NET_PASSWORD | net ads join -U '${adminuser}' ${no_dns_updates} ${ou}",
+        command     => "echo \$NET_PASSWORD | net ads join -U '${adminuser}' ${no_dns_updates_arg} ${ou}",
         notify      => Service['SambaWinBind'],
         require     => Package['SambaClassic'],
       }
