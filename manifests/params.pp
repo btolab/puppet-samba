@@ -38,7 +38,7 @@ class samba::params(
           $servivesambadc         = 'samba-ad-dc'
           if $facts['os']['name'] == 'Ubuntu' {
             $servivesmb           = 'smbd'
-          } elsif ($facts['os']['name'] == 'Debian') and ($facts['os']['release']['major'] >= '8') {
+          } elsif ($facts['os']['name'] == 'Debian') and (Integer($facts['os']['release']['major']) >= 8) {
             $servivesmb           = 'smbd'
           } else {
             $servivesmb           = 'samba'
